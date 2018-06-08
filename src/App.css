@@ -1,9 +1,10 @@
 .movie {
-  width: 200px;
-  height: 100px;
+  width: 250px;
+  max-height: 300px;
   padding: 12px;
   margin: 3px;
   position: relative;
+  overflow: scroll;
 }
 
 .movies {
@@ -14,8 +15,8 @@
 
 .delete-key {
   position: absolute;
-  top: 3px;
-  right: 3px;
+  top: 10px;
+  right: 15px;
   visibility: hidden;
   cursor: pointer;
 }

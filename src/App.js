@@ -18,8 +18,9 @@ class App extends Component {
     this.renderMovies = this.renderMovies.bind(this);
   }
   componentDidMount() {
-    console.log('App mounted.');
     this.refs.search.focus();
+
+    // GET  ALL MOVIES
     fetch(this.dbURL)
       .then(response => {
         return response.json()
@@ -37,16 +38,19 @@ class App extends Component {
     e.preventDefault();
     let title = this.refs.movieTitle.value;
     let rating = this.refs.movieRating.value;
-
-    if (!title || !rating) {
-      console.log('incomplete form');
-      return;
-    }
+    let genre = this.refs.movieGenre.value;
+    let year = this.refs.movieYear.value;
+    let actors = this.refs.movieActors.value.split(',').map((item) => {
+      return item.trim();
+    });
 
     // POST THE NEW MOVIE TO THE DB
     let data = {
       title: title,
-      rating: rating
+      rating: rating,
+      genre: genre,
+      year: year,
+      actors: actors
     };
 
     fetch(this.dbURL, {
@@ -68,9 +72,10 @@ class App extends Component {
       this.refs.movieForm.reset();
       this.refs.movieTitle.focus();
     })
-    .catch(error => console.error('Error: ', error));
+    .catch(error => console.error('Error!', error));
   }
   handleDelete(e) {
+    // DELETE AN INDIVIDUAL MOVIE
     let id = e.target.dataset.movieid;
     let data = {
       id: id
@@ -144,11 +149,19 @@ class App extends Component {
     } else {
       return (
         <div className="movies">
-          { visibleMovies ? visibleMovies.map((movie, index) => {
+          { visibleMovies ? visibleMovies.map((movie, i) => {
             return (
-              <div key={index} className="movie card">
+              <div key={i} className="movie card">
                 <h5>{movie.title}</h5>
                 <p>Rating: {movie.rating}</p>
+                <p>Genre: {movie.genre}</p>
+                <p>Year: {movie.year}</p>
+                <div>
+                  Actors: <br />
+                  {movie.actors.map((actor, j) => {
+                    return <p style={{marginBottom: 0}} key={j}>- {actor}</p>
+                  })}
+                </div>
                 <span data-movieid={movie.id} onClick={this.handleDelete} className="delete-key">X</span>
               </div>
             );
@@ -159,7 +172,7 @@ class App extends Component {
   }
   render() {
     return (
-      <div className="App">
+      <div className="App pb-5">
         <header
           className="mb-5 border-bottom">
           <div className="container">
@@ -184,9 +197,7 @@ class App extends Component {
             </div>
           </div>
           <div>
-            <h4
-              style={{fontWeight: 200}}
-            >Add a new one.</h4>
+            <h4 style={{fontWeight: 200}}>Add a new one.</h4>
             <form ref="movieForm" onSubmit={this.handleSubmit}>
               <div className="form-group">
                 <label htmlFor="movieTitle">Title: </label>
@@ -213,6 +224,11 @@ class App extends Component {
                   })
                 }
                 </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="movieActors">Actors: </label>
+                <input type="text" className="form-control" ref="movieActors" id="movieActors"></input>
+                <small id="actorsHelp" className="form-text text-muted">Please separate actors by comma.</small>
               </div>
               <button className="btn btn-primary" type="submit">Submit</button>
             </form>
